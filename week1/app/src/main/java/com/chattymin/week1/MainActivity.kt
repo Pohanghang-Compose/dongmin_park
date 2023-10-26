@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -64,20 +65,22 @@ fun ProfileCard() {
 }
 
 @Composable
-fun IdentificationCard() = Text(
+fun IdentificationCard() = Box(
     modifier = Modifier
         .background(DarkYellow)
         .fillMaxWidth()
-        .padding(24.dp),
-    textAlign = TextAlign.Center,
-    color = Color.White,
-    fontWeight = FontWeight.Bold,
-    text = "IDENTIFICATION CARD"
-)
+        .fillMaxHeight(0.1f),
+    contentAlignment = Alignment.Center,
+) {
+    Text(
+        color = Color.White,
+        fontWeight = FontWeight.Bold,
+        text = "IDENTIFICATION CARD"
+    )
+}
 
 @Composable
-fun UserInfo() {
-    Column(
+fun UserInfo() = Column(
         modifier = Modifier
             .background(BackgroundGray)
             .fillMaxWidth()
@@ -90,7 +93,6 @@ fun UserInfo() {
         UserName()
         UnderLineSection()
     }
-}
 
 @Composable
 fun ProfilePicture() {
@@ -123,7 +125,7 @@ fun UserName() = Column(
         fontWeight = FontWeight.ExtraBold
     )
     Text(
-        modifier = Modifier.padding(8.dp),
+        modifier = Modifier.padding(top = 8.dp),
         text = "{ Leviathan }",
         fontWeight = FontWeight.ExtraBold
     )
@@ -137,8 +139,7 @@ fun UnderLineSection() = Column {
 }
 
 @Composable
-fun UnderLineInfo(title: String, text: String) {
-    Column {
+fun UnderLineInfo(title: String, text: String) = Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Bottom
@@ -162,7 +163,6 @@ fun UnderLineInfo(title: String, text: String) {
             color = DarkYellow
         )
     }
-}
 
 @Composable
 fun UserOrganisation() = Row(
