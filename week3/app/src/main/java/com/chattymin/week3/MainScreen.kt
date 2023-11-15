@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -47,7 +48,6 @@ import androidx.compose.ui.window.Dialog
 
 @Composable
 fun MainScreen() {
-    val expanded = remember { mutableStateOf(false) }
     var percent by remember { mutableStateOf(0f) }
     val percentAnimate by animateFloatAsState(
         targetValue = percent,
@@ -58,17 +58,18 @@ fun MainScreen() {
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SurveyBtn(expanded)
-        CustomProgressBar(percentAnimate)
-        ShowDialog(expanded) {
+        SurveyBtn(){
             percent = it * 7.2f
         }
+        CustomProgressBar(percentAnimate)
         ShowPoint(point = percent)
     }
 }
 
 @Composable
-fun SurveyBtn(expanded: MutableState<Boolean>) {
+fun SurveyBtn(calcPercent: (Int) -> Unit) {
+    val expanded = remember { mutableStateOf(false) }
+
     Button(
         onClick = { expanded.value = true },
         modifier = Modifier
@@ -76,6 +77,19 @@ fun SurveyBtn(expanded: MutableState<Boolean>) {
     ) {
         Text(text = "설문조사 하기")
     }
+
+    Crossfade(targetState = expanded.value, label = ""){
+        if (it) {
+            ShowDialog(){percent ->
+                calcPercent(percent)
+                expanded.value = false
+            }
+        }
+
+    }
+//    ShowDialog(expanded) {
+//        calcPercent(it)
+//    }
 }
 
 @Composable
@@ -111,12 +125,9 @@ val titleList =
     listOf("Compose 스터디 만족도", "Compose 스터디 난이도", "오늘 점심 메뉴 만족도", "오늘 저녁 메뉴 만족도", "SOPT 만족도")
 
 @Composable
-fun ShowDialog(expanded: MutableState<Boolean>, add: (Int) -> Unit) {
-    val sum = remember { mutableStateOf(0) }
-
-    if (expanded.value) {
+fun ShowDialog(add: (Int) -> Unit) =
         Dialog(
-            onDismissRequest = { expanded.value = false }
+            onDismissRequest = {}
         ) {
             LazyColumn(
                 modifier = Modifier
@@ -126,24 +137,26 @@ fun ShowDialog(expanded: MutableState<Boolean>, add: (Int) -> Unit) {
                 verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(titleList) {
-                    Survey(title = it, sum = sum)
+                val starsList = MutableList(titleList.size){ 0 }
+
+                itemsIndexed(titleList) {index, title ->
+                    Survey(title = title){stars ->
+                        starsList[index] = stars
+                    }
                 }
                 item {
                     Button(onClick = {
-                        add(sum.value)
-                        expanded.value = false
+                        add(starsList.sum())
+                        //expanded.value = false
                     }) {
                         Text(text = "제출하기")
                     }
                 }
             }
         }
-    }
-}
 
 @Composable
-fun Survey(title: String, sum: MutableState<Int>) {
+fun Survey(title: String, setStars: (Int) -> Unit) {
     val expanded = remember { mutableStateOf(false) }
     val stars = remember { mutableStateOf(0) }
     val starsAnimate = animateIntAsState(targetValue = stars.value, label = "star animate")
@@ -167,7 +180,7 @@ fun Survey(title: String, sum: MutableState<Int>) {
                 )
                 DropDownMenu(expanded = expanded) {
                     stars.value = it
-                    sum.value += it
+                    setStars(it)
                 }
             }
         }
@@ -187,7 +200,6 @@ fun Survey(title: String, sum: MutableState<Int>) {
 @Composable
 fun DisplayStars(count: Int, size: Dp){
     repeat(count) {
-        Log.e("TAG", "DisplayStars: $it", )
         Icon(
             imageVector = Icons.Default.Star,
             tint = Color(0xFFD0B336),
