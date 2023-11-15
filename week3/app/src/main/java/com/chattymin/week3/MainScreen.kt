@@ -1,5 +1,6 @@
 package com.chattymin.week3
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,13 +45,17 @@ import androidx.compose.ui.window.Dialog
 fun MainScreen() {
     val expanded = remember { mutableStateOf(false) }
     var percent by remember { mutableStateOf(0f) }
-
+    val percentAnimate by animateFloatAsState(
+        targetValue = percent,
+        label = "custom progress bar"
+    )
+    
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SurveyBtn(expanded)
-        CustomProgressBar(percent)
+        CustomProgressBar(percentAnimate)
         ShowDialog(expanded) {
             percent = it * 7.2f
         }
@@ -218,4 +223,3 @@ fun ShowPoint(point: Float) {
         text = (point / 180 * 100).toInt().toString()
     )
 }
-
