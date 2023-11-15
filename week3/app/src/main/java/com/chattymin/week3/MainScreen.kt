@@ -1,6 +1,9 @@
 package com.chattymin.week3
 
+import android.util.Log
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +40,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -141,7 +145,8 @@ fun ShowDialog(expanded: MutableState<Boolean>, add: (Int) -> Unit) {
 @Composable
 fun Survey(title: String, sum: MutableState<Int>) {
     val expanded = remember { mutableStateOf(false) }
-    var stars by remember { mutableStateOf(0) }
+    val stars = remember { mutableStateOf(0) }
+    val starsAnimate = animateIntAsState(targetValue = stars.value, label = "star animate")
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -161,7 +166,7 @@ fun Survey(title: String, sum: MutableState<Int>) {
                     contentDescription = title
                 )
                 DropDownMenu(expanded = expanded) {
-                    stars = it
+                    stars.value = it
                     sum.value += it
                 }
             }
@@ -169,17 +174,26 @@ fun Survey(title: String, sum: MutableState<Int>) {
         Row {
             val size = 40.dp
 
-            if (stars == 0) Spacer(modifier = Modifier.size(size))
-
-            repeat(stars) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    tint = Color(0xFFD0B336),
-                    contentDescription = "별점",
-                    modifier = Modifier.size(size)
-                )
+            starsAnimate.value.let { starsValue ->
+                when(starsValue) {
+                    0 -> Spacer(modifier = Modifier.size(size))
+                    else -> DisplayStars(count = starsValue, size = size)
+                }
             }
         }
+    }
+}
+
+@Composable
+fun DisplayStars(count: Int, size: Dp){
+    repeat(count) {
+        Log.e("TAG", "DisplayStars: $it", )
+        Icon(
+            imageVector = Icons.Default.Star,
+            tint = Color(0xFFD0B336),
+            contentDescription = "별점",
+            modifier = Modifier.size(size)
+        )
     }
 }
 
