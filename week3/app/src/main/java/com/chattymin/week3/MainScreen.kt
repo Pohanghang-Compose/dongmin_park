@@ -87,9 +87,6 @@ fun SurveyBtn(calcPercent: (Int) -> Unit) {
         }
 
     }
-//    ShowDialog(expanded) {
-//        calcPercent(it)
-//    }
 }
 
 @Composable
@@ -147,7 +144,6 @@ fun ShowDialog(add: (Int) -> Unit) =
                 item {
                     Button(onClick = {
                         add(starsList.sum())
-                        //expanded.value = false
                     }) {
                         Text(text = "제출하기")
                     }
